@@ -14,7 +14,7 @@ DATASOURCES = {
                 }
             },
             {
-                "function": "transform_csv",
+                "function": "crop_csv",
                 "args": {}
             }
         ]
@@ -40,8 +40,16 @@ def download_csv(path, upstream_data, header=None):
     return pd.read_csv(path, header=header)
 
 
-def transform_csv(upstream_data):
+def crop_csv(upstream_data):
     return upstream_data.iloc[0:37]
+
+
+def transform_csv(upstream_data):
+    transformed_records = []
+    for name, record in df.iterrows():
+        record["foo"] = record["foo"] * 100
+        transformed_records.append(record)
+    return pd.DataFrame.from_records(transformed_records)
 
 
 class Pipeline:
@@ -82,6 +90,7 @@ if __name__ == "__main__":
         functions={
             "download_csv": download_csv,
             "transform_csv": transform_csv,
+            "crop_csv": crop_csv
         }
     )
     for name, source in DATASOURCES.items():
