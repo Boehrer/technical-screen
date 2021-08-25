@@ -3,7 +3,7 @@ import unittest
 import pandas as pd
 
 
-DATASOURCES = {
+ETLS = {
     "us_spending": {
         "steps": [
             {
@@ -57,28 +57,28 @@ class Pipeline:
     def __init__(self, functions):
         self.functions = functions
 
-    def run(self, datasource):
-        """
-        runs a datasource's steps
-        """
-        data = None
-        for step in source["steps"]:
-            data = self.run_step(step, data)
-
     def run_step(self, step, upstream_data):
         """
-        runs a step from a datasource
+        runs a step from an etl
         """
         function = self.functions[step["function"]]
         return function(**step["args"], upstream_data=upstream_data)
 
-    def run_multiple(self, datasources):
+    def run_etl(self, etl):
         """
-        runs multiple datasource's steps
+        runs all steps in an etl
         """
-        for source in datasources:
-            for step in source["steps"]:
-                self.run_step(step, data)
+        data = None
+        for step in etl["steps"]:
+            data = self.run_etl(step, data)
+
+    def run_etls(self, etls):
+        """
+        runs multiple etls
+        """
+        for etl in etls:
+            for step in etl["steps"]:
+                self.run_etl(step, data)
 
 
 class TestPipeline(unittest.TestCase):
@@ -93,6 +93,6 @@ if __name__ == "__main__":
             "crop_csv": crop_csv
         }
     )
-    for name, source in DATASOURCES.items():
-        print(f"running {name}")
-        pipeline.run(source)
+    for name, etl in ETL.items():
+        print(f"running etl {name}")
+        pipeline.run(etl)
