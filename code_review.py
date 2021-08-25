@@ -70,7 +70,7 @@ class Pipeline:
         """
         data = None
         for step in etl["steps"]:
-            data = self.run_etl(step, data)
+            data = self.run_step(step, data)
 
     def run_etls(self, etls):
         """
