@@ -16,6 +16,12 @@ ETLS = {
             {
                 "function": "crop_csv",
                 "args": {}
+            },
+            {
+                "function": "write_csv",
+                "args": {
+                    "path": "s3://pipeline-data/us_spending.csv"
+                }
             }
         ]
     },
@@ -30,6 +36,12 @@ ETLS = {
             {
                 "function": "transform_csv",
                 "args": {}
+            },
+            {
+                "function": "write_csv",
+                "args": {
+                    "path": "s3://pipeline-data/population_density.csv"
+                }
             }
         ]
     }
@@ -50,6 +62,9 @@ def transform_csv(upstream_data):
         record["foo"] = record["foo"] * 100
         transformed_records.append(record)
     return pd.DataFrame.from_records(transformed_records)
+
+def write_csv(path, upstream_data):
+    upstream_data.to_csv(path)
 
 
 class Pipeline:
@@ -77,8 +92,9 @@ class Pipeline:
         runs multiple etls
         """
         for etl in etls:
+            data = None
             for step in etl["steps"]:
-                self.run_etl(step, data)
+                data = self.run_step(step, data)
 
 
 class TestPipeline(unittest.TestCase):
@@ -93,6 +109,6 @@ if __name__ == "__main__":
             "crop_csv": crop_csv
         }
     )
-    for name, etl in ETL.items():
+    for name, etl in ETLS.items():
         print(f"running etl {name}")
         pipeline.run(etl)
